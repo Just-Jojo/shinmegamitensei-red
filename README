@@ -1,6 +1,7 @@
 Just a little shin megami tensei game for Red-DiscordBot (https://github.com/Cog-Creators/Red-DiscordBot)
 
 # To install
+## NOTE currently this is not ready to be played or downloaded. Please do not add this cog
 Make sure you have `Downloader` loaded (`[p]load downloader`)
 Next type `[p]repo add smt-red https://github.com/Just-Jojo/smt-red` and follow the instructions it gives you
 Finally, type `[p]cog install smt-red smtred` and load the cog once it installs.
