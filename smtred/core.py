@@ -8,11 +8,9 @@ import logging
 from typing import TYPE_CHECKING, Final, Dict, List, Optional, Union, Tuple
 
 import discord
-from discord.utils import escape_markdown
 from redbot.core import Config, commands
 from redbot.core.bot import Red
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.chat_formatting import underline
 
 try:
     import orjson
@@ -74,9 +72,7 @@ class ShinMegamiTensei(commands.Cog):
         self._jacking_my_frost = await self.config.jack_frost_send()
         try:
             with open(bundled_data_path(self) / "demons.json") as fp:
-                data = _load_json(fp)
-                log.debug(f"{data = }")
-                self._demons = data
+                self._demons = _load_json(fp)
         except Exception as e:
             log.debug("Couldn't open file", exc_info=e)
 
@@ -99,14 +95,22 @@ class ShinMegamiTensei(commands.Cog):
     async def smt_register(self, ctx: commands.Context) -> None:
         """Start a contract with Igor"""
         registered = await self.config.user(ctx.author).registered()
+        log.info(registered)
         if registered:
             first, last = registered
-            actual = contract.format(rname=underline(first), lname=underline(last))
+            actual = contract.format(rname=first, lname=last)
             await self.send(ctx, actual)
             return
-        view = RegisterView()
-        actual = contract.format(rname=escape_markdown("_" * 10), lname=escape_markdown("_" * 9))
-        await self.jacking_my_frost(ctx, contract, view=view)
+        view = RegisterView(ctx)
+        await view.start()
+        await view.wait()
+        first_name = view._first_name
+        last_name = view._last_name
+        await self.config.user(ctx.author).registered.set([first_name, last_name])
+        await ctx.send(
+            "Good. All signed and sealed. Now let's begin the transfusion. "
+            "Oh, don't you worry. Whatever happens... You may think it all a mere bad dream..."
+        )
 
     def cog_check(self, ctx: commands.Context) -> bool:  # type:ignore
         return ctx.author.id == 544974305445019651
@@ -131,6 +135,7 @@ class ShinMegamiTensei(commands.Cog):
 
     @property
     def jacking_my_frost(self):
+        """I'm over here jacking my frost, I got jack on my frost man, I'm a freak man, for real"""
         return self.send
 
     @jacking_my_frost.setter

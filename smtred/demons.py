@@ -6,11 +6,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Final, List, Union, Tuple
+from ._types import Self
 
-try:
-    from typing import Self
-except ImportError:
-    from typing_extensions import Self  # type:ignore
 
 __all__: Final[Tuple[str, str]] = ("Arcana", "Demon")
 

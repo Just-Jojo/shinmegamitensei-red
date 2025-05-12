@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import logging
 from typing import TYPE_CHECKING, Dict, Final, List, Optional, Tuple, Union, overload
 
 import discord
@@ -16,10 +17,13 @@ try:
 except ImportError:
     from typing_extensions import Self  # type:ignore
 
+from .constants import contract
+
 
 __all__: Final[tuple] = ("RegisterView", "Menu", "Page")
 
 
+log = logging.getLogger("red.smtred.modals")
 button_emojis: Final[Dict[Tuple[bool, bool], str]] = {
     (False, True): "\N{BLACK LEFT-POINTING DOUBLE TRIANGLE}",
     (False, False): "\N{BLACK LEFT-POINTING TRIANGLE}\N{VARIATION SELECTOR-16}",
@@ -179,25 +183,42 @@ class Menu(discord.ui.View):
 
 
 class RegisterView(discord.ui.View):
-    if TYPE_CHECKING:
-        ctx: commands.Context
-
-    def __init__(self, *, timeout: float = 100.0):
+    def __init__(self, ctx: commands.Context):
         super().__init__(timeout=100.0)
+        self.ctx = ctx
+        self.msg: discord.Message
         self._first_name: Optional[str] = None
         self._last_name: Optional[str] = None
 
+    async def start(self) -> None:
+        actual = contract.format(rname=" " * 10, lname=" " * 9)
+        log.debug(f"{actual = }")
+        self.msg = await self.ctx.send(actual, view=self)
+
+    async def interaction_check(self, inter: discord.Interaction):
+        log.info(f"{inter.user = }")
+        if inter.user.id != 544974305445019651:
+            await inter.response.send_message("I will find you", ephemeral=True)
+            return False
+        return True
+
     @button_dec(label="Register", style=discord.ButtonStyle.blurple)
-    async def register(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def register(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         modal = RegisterModal(title="Sign the contract...")
         await interaction.response.send_modal(modal)
         await modal.wait()
+        self._first_name = rn = modal.first_name.value or modal.first_name.placeholder
+        self._last_name = ln = modal.last_name.value or modal.last_name.placeholder
+        button.disabled = True
         if TYPE_CHECKING:
-            assert isinstance(modal.first_name, str)
-            assert isinstance(modal.last_name, str)
-        self._first_name = modal.first_name
-        self._last_name = modal.last_name
-        await interaction.response.send_message("Good, all signed and sealed then")
+            assert rn is not None
+            assert ln is not None
+        if len(rn) < 10:
+            rn += "".join(" " for _ in range(10 - len(rn)))
+        if len(ln) < 10:
+            ln += "".join(" " for _ in range(9 - len(rn)))
+        await self.msg.edit(content=contract.format(rname=rn, lname=ln), view=self)
+        self.stop()
 
 
 class RegisterModal(discord.ui.Modal):
@@ -205,9 +226,16 @@ class RegisterModal(discord.ui.Modal):
         label="Your first name...",
         placeholder="Kanako",
         required=False,
+        min_length=2,
+        max_length=25,
     )
     last_name: discord.ui.TextInput = discord.ui.TextInput(
         label="Your last name...",
         placeholder="Ishimaru",
         required=False,
+        min_length=2,
+        max_length=25,
     )
+
+    async def on_submit(self, inter: discord.Interaction) -> None:
+        await inter.response.defer()
