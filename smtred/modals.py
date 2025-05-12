@@ -12,11 +12,7 @@ import discord
 from discord.ui.button import button as button_dec
 from redbot.core import commands
 
-try:
-    from typing import Self
-except ImportError:
-    from typing_extensions import Self  # type:ignore
-
+from ._types import Self
 from .constants import contract
 
 

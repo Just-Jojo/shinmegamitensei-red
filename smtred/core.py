@@ -49,6 +49,10 @@ class ShinMegamiTensei(commands.Cog):
         self.config = Config.get_conf(self, 544974305445019651, force_registration=True)
         self.config.register_global(jack_frost_send=True)
         self.config.register_user(**config_structure)
+
+        self.config.init_custom("MACCA_BANK", 1)
+        self.config.register_custom("MACCA_BANK", {"macca": 0})
+
         self._demons: Dict[str, Union[str, int]] = {}
 
         # For Jack Frost dialogue

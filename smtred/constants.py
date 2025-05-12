@@ -9,7 +9,6 @@ __all__ = ("config_structure", "__author__", "__version__", "contract")
 
 config_structure: Final[dict] = {
     "demons": [],  # List[Demon]
-    "macca": 0,
     "items": [],  # TODO(Amy) maybe dict with types?
     "registered": [],  # Will be their name
 }
