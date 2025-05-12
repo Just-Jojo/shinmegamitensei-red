@@ -1,0 +1,54 @@
+{
+    "pixie": {
+        "stats": {
+            "hp": 174,
+            "sp": 14,
+            "level": 2,
+            "type": "timid"
+        },
+        "arcana": "LOVERS",
+        "exp": 4,
+        "macca": 184,
+        "resistances": {
+            "phys": "NONE",
+            "pierce": "WEAK",
+            "fire": "NONE",
+            "ice": "WEAK",
+            "elec": "STRONG",
+            "wind": "WEAK",
+            "psy": "WEAK",
+            "nuke": "WEAK",
+            "light": "STRONG",
+            "dark": "WEAK",
+            "alimighty": "NONE"
+        },
+        "moves": {
+            "zio": {
+                "level": 0,
+                "cost": 4,
+                "cost_type": "fp"
+            },
+            "dia": {
+                "level": 0,
+                "cost": 3,
+                "cost_type": "fp"
+            },
+            "patra": {
+                "level": 3,
+                "cost": 4,
+                "cost_type": "fp"
+            },
+            "tarukaja": {
+                "level": 4,
+                "cost": 8,
+                "cost_type": "fp"
+            },
+            "resist confuse": {
+                "level": 6,
+                "cost": "AUTO",
+                "cost_type": "fp"
+            }
+        },
+        "url": "https://static.wikia.nocookie.net/megamitensei/images/0/0e/Pixie_%28SMT_PSX_Art%29.png/revision/latest?cb=20210912214610"
+    }
+}

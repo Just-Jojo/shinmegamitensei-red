@@ -1,0 +1,19 @@
+{
+    "name": "shinmegamitensei",
+    "short": "Play Shin Megami Tensei!",
+    "description": "Play a modified version of Shin Megami Tensei that runs in Red",
+    "end_user_data_statement": "This cog stores data provided by users for the express purpose of redisplaying. It does not store user data which was not provided through a command. Users may remove their own data without making a data removal request. This cog does not support data reqeusts, but will respect deletion requests",
+    "install_msg": "Welcome to the Velvet room. Thank you for installing Shin Megami Tensei: Red.\nTo begin, type `[p]shinmegamitensei register`",
+    "min_python_version": [3, 8, 1],
+    "min_bot_version": "3.5.0",
+    "author": ["Amy (jojo7791)"],
+    "tags": [
+        "rpg",
+        "roleplaying game",
+        "shin megami tensei",
+        "smt",
+        "persona",
+        "Shin Megami Tensei: Persona"
+    ],
+    "type": "COG"
+}
