@@ -11,6 +11,13 @@ config_structure: Final[dict] = {
     "demons": [],  # List[Demon]
     "items": [],  # TODO(Amy) maybe dict with types?
     "registered": [],  # Will be their name
+    "stats": {
+        "strength": 5,
+        "magic": 5,
+        "vitality": 5,
+        "agility": 5,
+        "luck": 5,
+    },
 }
 
 __author__: Final[str] = "Amy (jojo7791)"

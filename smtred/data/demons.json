@@ -6,6 +6,13 @@
             "level": 2,
             "type": "timid"
         },
+        "abilities": {
+            "strength": 3,
+            "magic": 6,
+            "vitality": 4,
+            "agility": 2,
+            "luck": 7
+        },
         "arcana": "LOVERS",
         "exp": 4,
         "macca": 184,
