@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-from typing import Final, Protocol, Union, Tuple, TypeVar
+from typing import Final, Protocol, Tuple, TypeVar, Union
 
 import discord
 
-__all__: Final[Tuple[str, ...]] = ("Readable", "Self", "UserOrMember")
+__all__: Final[Tuple[str, ...]] = ("Readable", "Self", "UserMemberOrInt")
 
 _T_co = TypeVar("_T_co", covariant=True)
 
@@ -28,6 +28,6 @@ else:
     from typing_extensions import Self
 
 
-UserOrMember = Union[discord.User, discord.Member]
+UserMemberOrInt = Union[discord.User, discord.Member, int]
 
 del sys, discord  # Not for export

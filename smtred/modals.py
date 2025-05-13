@@ -15,7 +15,6 @@ from redbot.core import commands
 from ._types import Self
 from .constants import contract
 
-
 __all__: Final[tuple] = ("RegisterView", "Menu", "Page")
 
 

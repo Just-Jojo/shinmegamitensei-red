@@ -4,8 +4,7 @@
 from __future__ import annotations
 
 import logging
-
-from typing import TYPE_CHECKING, Final, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Dict, Final, List, Optional, Tuple, Union
 
 import discord
 from redbot.core import Config, commands
@@ -28,10 +27,18 @@ except ModuleNotFoundError:
 
     _load_json = json.load
 
+if TYPE_CHECKING:
+    # I'M GOING TO FUCKING KILL MYSELF
+    from discord.ext.commands._types import BotT
+    from discord.ext.commands import Context
+
+else:
+    Context = commands.Context
+
 from .constants import __author__, __version__, config_structure, contract
 from .demons import Demon
+from .macca import Macca, MaccaBank  # noqa
 from .modals import Menu, Page, RegisterView  # noqa
-
 
 __all__: Final[Tuple[str]] = ("ShinMegamiTensei",)
 
@@ -51,8 +58,9 @@ class ShinMegamiTensei(commands.Cog):
         self.config.register_user(**config_structure)
 
         self.config.init_custom("MACCA_BANK", 1)
-        self.config.register_custom("MACCA_BANK", {"macca": 0})
+        self.config.register_custom("MACCA_BANK", macca=0)
 
+        self.macca_bank = MaccaBank(self.config)
         self._demons: Dict[str, Union[str, int]] = {}
 
         # For Jack Frost dialogue
@@ -64,6 +72,12 @@ class ShinMegamiTensei(commands.Cog):
     async def cog_unload(self) -> None:
         if self._task:
             self._task.cancel()
+
+    def cog_check(self, ctx: Context[BotT]) -> bool:
+        # I can't figure out how to get MyPy to stop fussing
+        # It expects `Context[BotT]`
+        # NEVERMIND I'M A FUCKING GENIUS
+        return ctx.author.id == 544974305445019651
 
     def format_help_for_context(self, ctx: commands.Context) -> str:
         return (
@@ -114,10 +128,18 @@ class ShinMegamiTensei(commands.Cog):
         await ctx.send(
             "Good. All signed and sealed. Now let's begin the transfusion. "
             "Oh, don't you worry. Whatever happens... You may think it all a mere bad dream..."
+            "\n\nOh, and have some Macca, would you?\n-# Added ћ200 to your bank"
         )
+        await self.macca_bank.set_user_amount(ctx.author, 200)
 
-    def cog_check(self, ctx: commands.Context) -> bool:  # type:ignore
-        return ctx.author.id == 544974305445019651
+    @shin_megami_tensei.command(name="bank")
+    async def smt_bank(self, ctx: commands.Context) -> None:
+        """See the amount of Macca you have"""
+        if not await self.config.user(ctx.author).registered():
+            await ctx.send(f"You are not registered yet, use `{ctx.prefix}smt register`")
+            return
+        macca = await self.macca_bank.get_user_amount(ctx.author)
+        await ctx.send(f"You have ћ{macca}")
 
     async def send(
         self, ctx: commands.Context, content: Optional[str] = None, **kwargs

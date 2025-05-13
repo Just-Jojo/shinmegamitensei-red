@@ -5,9 +5,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Final, List, Union, Tuple
-from ._types import Self
+from typing import Dict, Final, List, Tuple, Union
 
+from ._types import Self
 
 __all__: Final[Tuple[str, str]] = ("Arcana", "Demon")
 
@@ -158,5 +158,5 @@ class Demon:
             "exp": self.exp,
             "macca": self.macca,
             "resistances": self._resistances,
-            "moves": self._moves
+            "moves": self._moves,
         }
