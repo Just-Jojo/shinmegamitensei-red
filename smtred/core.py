@@ -11,34 +11,12 @@ from redbot.core import Config, commands
 from redbot.core.bot import Red
 from redbot.core.data_manager import bundled_data_path
 
-try:
-    import orjson
-
-    if TYPE_CHECKING:
-        from ._types import Readable
-
-    # NOTE I think orjson gets installed with red, but I'm not sure
-
-    def _load_json(fp: Readable, *args, **kwargs):
-        return orjson.loads(fp.read(), *args, **kwargs)
-
-except ModuleNotFoundError:
-    import json
-
-    _load_json = json.load
-
-if TYPE_CHECKING:
-    # I'M GOING TO FUCKING KILL MYSELF
-    from discord.ext.commands._types import BotT
-    from discord.ext.commands import Context
-
-else:
-    Context = commands.Context
-
+from ._types import Context
 from .constants import __author__, __version__, config_structure, contract
 from .demons import Demon
 from .macca import Macca, MaccaBank  # noqa
 from .modals import Menu, Page, RegisterView  # noqa
+from .utils import load_json
 
 __all__: Final[Tuple[str]] = ("ShinMegamiTensei",)
 
@@ -73,7 +51,7 @@ class ShinMegamiTensei(commands.Cog):
         if self._task:
             self._task.cancel()
 
-    def cog_check(self, ctx: Context[BotT]) -> bool:
+    def cog_check(self, ctx: Context) -> bool:
         # I can't figure out how to get MyPy to stop fussing
         # It expects `Context[BotT]`
         # NEVERMIND I'M A FUCKING GENIUS
@@ -90,12 +68,13 @@ class ShinMegamiTensei(commands.Cog):
         self._jacking_my_frost = await self.config.jack_frost_send()
         try:
             with open(bundled_data_path(self) / "demons.json") as fp:
-                self._demons = _load_json(fp)
+                self._demons = load_json(fp)
         except Exception as e:
             log.debug("Couldn't open file", exc_info=e)
 
     @commands.group(name="shinmegamitensei", aliases=["smt"])
     async def shin_megami_tensei(self, ctx: commands.Context) -> None:
+        """Play Shin Megami Tensei: Red"""
         pass
 
     @shin_megami_tensei.command(name="testdemon")
@@ -113,7 +92,6 @@ class ShinMegamiTensei(commands.Cog):
     async def smt_register(self, ctx: commands.Context) -> None:
         """Start a contract with Igor"""
         registered = await self.config.user(ctx.author).registered()
-        log.info(registered)
         if registered:
             first, last = registered
             actual = contract.format(rname=first, lname=last)
@@ -139,7 +117,7 @@ class ShinMegamiTensei(commands.Cog):
             await ctx.send(f"You are not registered yet, use `{ctx.prefix}smt register`")
             return
         macca = await self.macca_bank.get_user_amount(ctx.author)
-        await ctx.send(f"You have ћ{macca}")
+        await ctx.send(f"You have {macca}")
 
     async def send(
         self, ctx: commands.Context, content: Optional[str] = None, **kwargs

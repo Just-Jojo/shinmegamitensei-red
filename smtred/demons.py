@@ -5,11 +5,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Final, List, Tuple, Union
+from typing import overload, Dict, Final, List, Optional, Set, Tuple, Union
+
+import discord
 
 from ._types import Self
 
-__all__: Final[Tuple[str, str]] = ("Arcana", "Demon")
+__all__: Final[Tuple[str, ...]] = (
+    "Abilities", "Arcana", "CostType", "Demon", "DemonNotFound", "Move",
+)
 
 _DEFAULT_MOVES: Final[Dict[str, Dict[str, Union[int, str]]]] = {
     "what": {
@@ -18,6 +22,14 @@ _DEFAULT_MOVES: Final[Dict[str, Dict[str, Union[int, str]]]] = {
         "level": 0,
     },
 }
+_DEFAULT_ABILITIES = {
+    k: 5 for k in ("strength", "magic", "vitality", "agility", "luck")
+}
+
+
+class DemonNotFound(RuntimeError):
+    def __init__(self):
+        super().__init__("Couldn't find a demon!")
 
 
 class CostType(Enum):
@@ -84,6 +96,15 @@ def _to_rmn(num: int) -> str:
     return result
 
 
+@dataclass
+class Abilities:
+    strength: int = 5
+    magic: int = 5
+    vitality: int = 5
+    agility: int = 5
+    luck: int = 5
+
+
 class ResistEnum(Enum):
     WEAK = "WEAK"
     STRONG = "STRONG"
@@ -103,6 +124,7 @@ class Demon:
         self,
         name: str,
         stats: Dict[str, Union[str, int]],
+        abilities: Dict[str, int],
         arcana: str,
         exp: int,
         macca: int,
@@ -113,6 +135,10 @@ class Demon:
         self.name = name
         self._arcana = Arcana(arcana)
         self.arcana = self._arcana.pretty_name
+
+        self._abilities = abilities
+
+        self.abilities = Abilities(**abilities)
 
         self._stats = stats
         self.exp = exp
@@ -142,6 +168,7 @@ class Demon:
         return cls(
             data.pop("name", "None"),
             data.pop("stats", {}),
+            data.pop("abilities", {}),
             data.pop("arcana", "NONE"),
             data.pop("exp", 0),
             data.pop("macca", 0),
@@ -154,9 +181,41 @@ class Demon:
         return {
             "name": self.name,
             "stats": self._stats,
+            "abilities": self._abilities,
             "arcana": self._arcana,
             "exp": self.exp,
             "macca": self.macca,
             "resistances": self._resistances,
             "moves": self._moves,
         }
+
+
+class Party:
+    def __init__(self, user: discord.User, demons: Set[Demon]):
+        self.user = user
+        self._demons = demons
+        self.current_demon = self._get_next_demon(True)
+        self.turns = len(self._demons) + 1
+
+    @overload
+    def _get_next_demon(self) -> Demon: ...
+
+    @overload
+    def _get_next_demon(self, initial: bool = True) -> Demon: ...
+
+    def _get_next_demon(self, initial: bool = False) -> Demon:
+        hit: Optional[Demon]
+        if initial:
+            hit = None
+        else:
+            hit = self.current_demon
+        for demon in self._demons:
+            if not hit:
+                hit = demon
+                continue
+            if hit.abilities.vitality >= demon.abilities.agility:
+                continue
+            hit = demon
+        if not hit:
+            raise DemonNotFound
+        return hit

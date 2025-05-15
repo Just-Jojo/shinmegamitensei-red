@@ -187,7 +187,6 @@ class RegisterView(discord.ui.View):
 
     async def start(self) -> None:
         actual = contract.format(rname=" " * 10, lname=" " * 9)
-        log.debug(f"{actual = }")
         self.msg = await self.ctx.send(actual, view=self)
 
     async def interaction_check(self, inter: discord.Interaction):

@@ -3,13 +3,24 @@
 
 from __future__ import annotations
 
-from typing import Final, Protocol, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Final, Protocol, Tuple, TypeVar, Union
 
 import discord
+from discord.ext.commands import Context as DiscordContext
+from redbot.core.commands import Context as RedContext
 
-__all__: Final[Tuple[str, ...]] = ("Readable", "Self", "UserMemberOrInt")
+__all__: Final[Tuple[str, ...]] = ("Context", "Readable", "Self", "UserMemberOrInt")
 
 _T_co = TypeVar("_T_co", covariant=True)
+
+
+if TYPE_CHECKING:
+    from discord.ext.commands._types import BotT
+
+    Context = DiscordContext[BotT]
+
+else:
+    Context = RedContext
 
 
 # This is for `_load_json`

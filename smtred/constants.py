@@ -31,7 +31,3 @@ Poke you in the eye, say what?
 __**X** {rname}__\t\t__{lname}__
 **First name**\t\t**Last name**
 """
-
-
-if __name__ != "__main__":
-    del Final, annotations

@@ -17,9 +17,13 @@ from __future__ import annotations
 
 import discord
 
+from .demons import Demon, Party  # noqa
+
 __all__ = ("Session",)
 
 
 class Session:
-    def __init__(self, user: discord.User):
+    def __init__(self, user: discord.User, player_party: Party, enemy_party: Party):
         self.user = user
+        self.player_party = player_party
+        self.enemy_party = enemy_party
