@@ -56,6 +56,40 @@
                 "cost_type": "fp"
             }
         },
-        "url": "https://static.wikia.nocookie.net/megamitensei/images/0/0e/Pixie_%28SMT_PSX_Art%29.png/revision/latest?cb=20210912214610"
+        "url": "https://static.wikia.nocookie.net/megamitensei/images/0/0e/Pixie_%28SMT_PSX_Art%29.png/revision/latest?cb=20210912214610",
+        "description": ""
+    },
+    "jack frost": {
+        "stats": {
+            "hp": 214,
+            "sp": 99,
+            "level": 11,
+            "type": "timid"
+        },
+        "abilities": {
+            "strength": 8,
+            "magic": 9,
+            "vitality": 7,
+            "agility": 9,
+            "luck": 7
+        },
+        "arcana": "MAGICIAN",
+        "exp": 28,
+        "macca": 404,
+        "resistances": {
+            "phys": "NONE",
+            "pierce": "NONE",
+            "fire": "WEAK",
+            "ice": "NULL",
+            "elec": "NONE",
+            "wind": "NONE",
+            "psy": "NONE",
+            "nuke": "NONE",
+            "light": "NONE",
+            "dark": "NONE",
+            "alimighty": "NONE"
+        },
+        "url": "https://static.wikia.nocookie.net/megamitensei/images/0/0b/Jack_Frost_SMTV_Art.png/revision/latest?cb=20240511054605",
+        "description": "Hee ho!"
     }
 }

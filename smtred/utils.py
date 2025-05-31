@@ -12,11 +12,13 @@ try:
     import orjson
 
     if TYPE_CHECKING:
+        from typing import Any
+
         from ._types import Readable
 
     # NOTE I think orjson gets installed with red, but I'm not sure
 
-    def load_json(fp: Readable, *args, **kwargs):
+    def load_json(fp: Readable, *args, **kwargs) -> Any:
         return orjson.loads(fp.read(), *args, **kwargs)
 
 except ModuleNotFoundError:

@@ -12,17 +12,15 @@ from ._types import UserMemberOrInt
 __all__: Final[Tuple[str, ...]] = ("MaccaBank",)
 
 
-if TYPE_CHECKING:
-
-    def _get_user_id(maybe_user: UserMemberOrInt) -> int: ...
-
-else:
-
-    def _get_user_id(maybe_user):
-        return getattr(maybe_user, "id", maybe_user)
+def _get_user_id(maybe_user: UserMemberOrInt) -> int:
+    if isinstance(maybe_user, int):
+        return maybe_user
+    return maybe_user.id
 
 
 class Macca(int):
+    """int subclass that just adds `ћ` to the start of the str version"""
+
     def __str__(self) -> str:
         return f"ћ{super().__str__()}"
 
@@ -65,6 +63,14 @@ class MaccaBank:
         user_id = _get_user_id(user)
         await self._config.custom("MACCA_BANK", str(user_id)).macca.set(amount)
         self.__cache[user_id] = amount
+
+    async def can_pay(self, user: UserMemberOrInt, amount: int) -> bool:
+        if amount < 0:
+            raise ValueError("Cannot pay < 0 macca")
+        user_macca = await self.get_user_amount(user)
+        if user_macca >= amount:
+            return True
+        return False
 
     def __len__(self) -> int:
         return len(self.__cache)

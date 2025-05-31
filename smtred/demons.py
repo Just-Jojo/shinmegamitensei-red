@@ -5,16 +5,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import overload, Dict, Final, List, Optional, Set, Tuple, Union
+from typing import Dict, Final, Iterable, List, Optional, Tuple, Union, overload
 
 import discord
 
 from ._types import Self
 
 __all__: Final[Tuple[str, ...]] = (
-    "Abilities", "Arcana", "CostType", "Demon", "DemonNotFound", "Move",
+    "Abilities",
+    "Arcana",
+    "CostType",
+    "Demon",
+    "DemonNotFound",
+    "Move",
 )
 
+# None of these *should* be used if I'm not silly
+# But still gonna have them here just in case
 _DEFAULT_MOVES: Final[Dict[str, Dict[str, Union[int, str]]]] = {
     "what": {
         "cost": 0,
@@ -22,9 +29,7 @@ _DEFAULT_MOVES: Final[Dict[str, Dict[str, Union[int, str]]]] = {
         "level": 0,
     },
 }
-_DEFAULT_ABILITIES = {
-    k: 5 for k in ("strength", "magic", "vitality", "agility", "luck")
-}
+_DEFAULT_ABILITIES = {k: 5 for k in ("strength", "magic", "vitality", "agility", "luck")}
 
 
 class DemonNotFound(RuntimeError):
@@ -131,13 +136,17 @@ class Demon:
         resistances: Dict[str, str],
         moves: Dict[str, Dict[str, Union[str, int]]],
         url: str,
+        description: str,
     ):
         self.name = name
+        self.description = description
+        self.url = url
         self._arcana = Arcana(arcana)
         self.arcana = self._arcana.pretty_name
 
+        # We'll keep a backup of abilities for export
+        # and then have the "public" be `Abilities`
         self._abilities = abilities
-
         self.abilities = Abilities(**abilities)
 
         self._stats = stats
@@ -145,8 +154,8 @@ class Demon:
         self.macca = macca
         self._resistances = resistances
         res: List[Resistances] = []
-        for resitance, actual in resistances.items():
-            res.append(Resistances(name, ResistEnum(actual)))
+        for resistance, actual in resistances.items():
+            res.append(Resistances(resistance, ResistEnum(actual)))
         self.resistances = res
 
         self._moves = moves
@@ -163,6 +172,12 @@ class Demon:
             )
         self.moves = _moves
 
+    def higher_agility(self, other: Demon) -> bool:
+        if not isinstance(other, Demon):
+            raise TypeError(f"Expected Demon not {other.__class__!r}")
+        # we'll default to the player's party if the agility is the same
+        return other.abilities.agility <= self.abilities.agility
+
     @classmethod
     def from_json(cls, data: dict) -> Self:
         return cls(
@@ -175,6 +190,7 @@ class Demon:
             data.pop("resistances", {}),
             data.pop("moves", {}),
             data.pop("url", ""),
+            data.pop("description", "No description..."),
         )
 
     def to_json(self) -> dict:
@@ -187,11 +203,13 @@ class Demon:
             "macca": self.macca,
             "resistances": self._resistances,
             "moves": self._moves,
+            "url": self.url,
+            "description": self.description,
         }
 
 
 class Party:
-    def __init__(self, user: discord.User, demons: Set[Demon]):
+    def __init__(self, user: discord.User, demons: Iterable[Demon]):
         self.user = user
         self._demons = demons
         self.current_demon = self._get_next_demon(True)
@@ -204,18 +222,21 @@ class Party:
     def _get_next_demon(self, initial: bool = True) -> Demon: ...
 
     def _get_next_demon(self, initial: bool = False) -> Demon:
-        hit: Optional[Demon]
-        if initial:
-            hit = None
-        else:
-            hit = self.current_demon
+        hit: Optional[Demon] = None if initial else self.current_demon
         for demon in self._demons:
             if not hit:
                 hit = demon
                 continue
-            if hit.abilities.vitality >= demon.abilities.agility:
+            if not hit.higher_agility(demon):
                 continue
             hit = demon
         if not hit:
             raise DemonNotFound
         return hit
+
+    def sorted(self, *, reversed: bool = False) -> Party:
+        """Sorts demons by their agility stat"""
+        return Party(
+            self.user,
+            sorted(self._demons, key=lambda demon: demon.abilities.agility, reverse=reversed),
+        )

@@ -13,7 +13,7 @@ from discord.ui.button import button as button_dec
 from redbot.core import commands
 
 from ._types import Self
-from .constants import contract
+from .constants import CONTRACT
 
 __all__: Final[tuple] = ("RegisterView", "Menu", "Page")
 
@@ -186,7 +186,7 @@ class RegisterView(discord.ui.View):
         self._last_name: Optional[str] = None
 
     async def start(self) -> None:
-        actual = contract.format(rname=" " * 10, lname=" " * 9)
+        actual = CONTRACT.format(rname=" " * 10, lname=" " * 9)
         self.msg = await self.ctx.send(actual, view=self)
 
     async def interaction_check(self, inter: discord.Interaction):
@@ -211,7 +211,7 @@ class RegisterView(discord.ui.View):
             rn += "".join(" " for _ in range(10 - len(rn)))
         if len(ln) < 10:
             ln += "".join(" " for _ in range(9 - len(rn)))
-        await self.msg.edit(content=contract.format(rname=rn, lname=ln), view=self)
+        await self.msg.edit(content=CONTRACT.format(rname=rn, lname=ln), view=self)
         self.stop()
 
 

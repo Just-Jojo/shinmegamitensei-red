@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Final
 
-__all__ = ("config_structure", "__author__", "__version__", "contract")
+__all__ = ("config_structure", "__author__", "__version__", "CONTRACT")
 
 config_structure: Final[dict] = {
     "demons": [],  # List[Demon]
@@ -18,12 +18,13 @@ config_structure: Final[dict] = {
         "agility": 5,
         "luck": 5,
     },
+    "finished": False,  # TODO (Amy) Story work :3
 }
 
 __author__: Final[str] = "Amy (jojo7791)"
 __version__: Final[str] = "1.0.0.dev0"
 
-contract: Final[
+CONTRACT: Final[
     str
 ] = """I swear to tell the truth, the whole truth, and nothing but the truth
 Poke you in the eye, say what?

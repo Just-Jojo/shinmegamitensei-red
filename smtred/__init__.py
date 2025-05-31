@@ -12,7 +12,6 @@ del get_end_user_data_statement
 from .constants import __author__, __version__
 from .core import ShinMegamiTensei as ShinMegoonerTensei
 
-
 __all__ = ("__author__", "__red_end_user_data_statement__", "__version__", "setup")
 
 
